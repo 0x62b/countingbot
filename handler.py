@@ -4,6 +4,45 @@ def handle(event, say, client):
   channel = event.get("channel")
   user = event.get("user")
   parser = Parser(event.get("text"))
+  type = database.get_type(channel)
+
+  num = -1
+
+  # counting type
+  match type:
+    case "str":
+      num = parser.parse_str()
+    case "int":
+      num = parser.parse_int()
+    case _:
+      pass
+  
+  # is not a valid "count" in the channel's counting format
+  if num == -1:
+    client.reactions_add(
+      channel=channel,
+      name="question",
+      timestamp=event.get("ts")
+    )
+    return
+
+  reactions = []
+
+  # check last user and number
+  progress = database.get_progress(channel)
+
+  if not progress:
+    return
+
+  if user != progress[0] and progress[1] == (num - 1):
+    reactions.append("white_check_mark")
+
+  for reaction in reactions:
+    client.reactions_add(
+      channel=event.get("channel"),
+      name=reaction,
+      timestamp=event.get("ts")
+    )
 
 class Parser:
   def __init__(self, text: str):
