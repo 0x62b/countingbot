@@ -14,7 +14,7 @@ slack_app = App(
 )
 
 app = Flask(__name__)
-handler = SlackRequestHandler(slack_app)
+request_handler = SlackRequestHandler(slack_app)
 
 @slack_app.event("message")
 def new_message(event, say, client):
@@ -22,7 +22,7 @@ def new_message(event, say, client):
 
 @app.route("/slack/events")
 def slack_events():
-  return handler.handle(request)
+  return request_handler.handle(request)
 
 if __name__ == "__main__":
-  app.run(host="0.0.0.0", port="5000")
+  app.run(host="0.0.0.0", port=5000)
